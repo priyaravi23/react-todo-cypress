@@ -1,68 +1,122 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import Todo from './app/todo/todo';
-import './app/todo/todo.css'
-
-let counter = 1;
+import './app/todo/todo.css';
+import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import uuid from 'uuid';
 
 class App extends Component {
     state = {
-        list: [
+        todos: [
             {
-                id: 1,
+                id: 'a493a83b-dcdb-475a-8123-3e4b8bf3410c',
                 value: "Create an app using create-react-app CLI",
                 complete: true
             },
             {
-                id: 2,
+                id: '8c9fc3c0-3416-489b-a94f-123a6de60f6c',
                 value: "Style app",
                 complete: true
             },
             {
-                id: 3,
+                id: '1df70967-7323-4db2-a749-a15d7e6381f3',
                 value: "Add functionality",
                 complete: false
             }
         ],
-        item: ""
+        currentTodo: ""
     };
 
-    handleInputChange = event => {
+    handleTodoChange = event => {
         this.setState({
-            item: event.target.value
+            currentTodo: event.target.value
         });
     };
 
-    handleKeyPress = event => {
+    handleNewTodo = event => {
         if (event.key === "Enter") {
             event.preventDefault();
 
-            const item = {
-                id: counter++,
-                value: this.state.item.slice()
+            const newItem = {
+                id: uuid.v4(),
+                value: this.state.currentTodo.slice()
             };
             this.setState({
-                list: this.state.list.concat(item),
-                item: ""
+                todos: this.state.todos.concat(newItem),
+                currentTodo: ""
             });
         }
     };
 
     handleRemove = id => {
+        const filteredItems = this.state.todos.filter(item => item.id !== id);
+
         this.setState({
-            list: this.state.list.filter(c => c.id !== id)
+            todos: filteredItems
         });
     };
 
-    clearCompleted = () => {
-      const items = this.state.list.filter(item => item.id === "");
+    clearComplete = () => {
+        const remainingTodos = this.state.todos.filter(todo => {
+            if (!todo.complete) {
+                return todo;
+            }
+        });
 
         this.setState({
-            list: items
+            todos: remainingTodos
+        });
+    };
+
+    markComplete = (e) => {
+        let id = e.target.getAttribute('data-id');
+        let tempTodos = this.state.todos;
+
+        tempTodos.forEach((todo) => {
+            if (id === todo.id) {
+                if (todo.complete){
+                    todo.complete = false;
+                }
+                else if (!todo.complete) {
+                    todo.complete = true;
+                }
+            }
+        });
+
+        this.setState({
+            todos: tempTodos
+        });
+    };
+
+    getCompletedTodos = () => {
+        const completedTodos = this.state.todos.filter(todo => {
+            if (todo.complete) {
+                return todo;
+            }
+        });
+
+        this.setState({
+            todos: completedTodos
         })
     };
 
-    showCompleted = (id) => {
+    getActiveTodos = () => {
+        const activeTodos = this.state.todos.filter(todo => {
+            if (!todo.complete) {
+                return todo;
+            }
+        });
 
+        this.setState({
+            todos: activeTodos
+        })
+    };
+
+    getAllTodos = () => {
+      const allTodos = this.state.todos;
+
+      this.setState({
+          todos: allTodos
+      })
     };
 
     render() {
@@ -71,23 +125,27 @@ class App extends Component {
 
                 <header className="header">
                     <h1>Todo</h1>
-                    <input className="new-todo"
-                           type="text"
-                           autofocus
-                           value={this.state.item}
+                    <input type="text"
+                           autoFocus
+                           className="new-todo"
+                           value={this.state.currentTodo}
                            placeholder="What needs to be done?"
-                           onKeyPress={this.handleKeyPress}
-                           onChange={this.handleInputChange}
+                           onKeyPress={this.handleNewTodo}
+                           onChange={this.handleTodoChange}
                     />
                 </header>
 
                 <section className="main">
                     <ul className="todo-list">
-                        {this.state.list.map(item => {
+                        {this.state.todos.map(item => {
                             return (
-                                <li>
+                                <li className={item.complete ? "completed" : ""}>
                                     <div className="view">
-                                        <input className="toggle" type="checkbox" />
+                                        <input className="toggle"
+                                               type="checkbox"
+                                               checked={item.complete}
+                                               data-id={item.id}
+                                               onChange={this.markComplete}/>
                                         <Todo {...item} key={item.id} removeTodo={this.handleRemove} />
                                     </div>
                                 </li>
@@ -96,23 +154,25 @@ class App extends Component {
                     </ul>
                 </section>
 
-                <footer class="footer">
-                    <span class="todo-count"><strong>{ this.state.list.length }</strong> item left</span>
-                    <ul class="filters">
-                        <li>
-                            <a onClick={this.showAll}> All </a>
-                        </li>
-                        <li>
-                          <a onClick={this.showActive}> Active </a>
-                        </li>
-                        <li>
-                            <a onClick={this.showCompleted}> Completed </a>
-                        </li>
-                    </ul>
+                <Router>
+                    <footer class="footer">
+                        <span class="todo-count"><strong>{(this.state.todos.filter(todo => !todo.complete)).length}</strong> item left</span>
+                        <ul class="filters">
+                            <li>
+                                <a href="#" onClick={this.getAllTodos}>All</a>
+                            </li>
+                            <li>
+                                <a href="#" onClick={this.getActiveTodos}>Active</a>
+                            </li>
+                            <li>
+                                <a href="#" onClick={this.getCompletedTodos}>Completed</a>
+                            </li>
+                        </ul>
 
-                    <button className="clear-completed"
-                            onClick={this.clearCompleted}> Clear completed </button>
-                </footer>
+                        <button className="clear-completed"
+                                onClick={this.clearComplete}> Clear completed </button>
+                    </footer>
+                </Router>
 
     </section>
         );
