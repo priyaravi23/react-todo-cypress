@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Todo from './app/todo/todo';
-import './app/todo/todo.css'
+import './app/todo/todo.css';
+import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
 
 let counter = 1;
 
@@ -61,19 +62,15 @@ class App extends Component {
         })
     };
 
-    showCompleted = (id) => {
-
-    };
-
     render() {
         return (
             <section className="todoapp">
 
                 <header className="header">
                     <h1>Todo</h1>
-                    <input className="new-todo"
-                           type="text"
-                           autofocus
+                    <input type="text"
+                           autoFocus
+                           className="new-todo"
                            value={this.state.item}
                            placeholder="What needs to be done?"
                            onKeyPress={this.handleKeyPress}
@@ -96,23 +93,25 @@ class App extends Component {
                     </ul>
                 </section>
 
-                <footer class="footer">
-                    <span class="todo-count"><strong>{ this.state.list.length }</strong> item left</span>
-                    <ul class="filters">
-                        <li>
-                            <a onClick={this.showAll}> All </a>
-                        </li>
-                        <li>
-                          <a onClick={this.showActive}> Active </a>
-                        </li>
-                        <li>
-                            <a onClick={this.showCompleted}> Completed </a>
-                        </li>
-                    </ul>
+                <Router>
+                    <footer class="footer">
+                        <span class="todo-count"><strong>{ this.state.list.length }</strong> item left</span>
+                        <ul class="filters">
+                            <li>
+                                <Link to="/">All</Link>
+                            </li>
+                            <li>
+                                <Link to="/active">Active</Link>
+                            </li>
+                            <li>
+                                <li><Link to="/completed">Completed</Link></li>
+                            </li>
+                        </ul>
 
-                    <button className="clear-completed"
-                            onClick={this.clearCompleted}> Clear completed </button>
-                </footer>
+                        <button className="clear-completed"
+                                onClick={this.clearCompleted}> Clear completed </button>
+                    </footer>
+                </Router>
 
     </section>
         );
