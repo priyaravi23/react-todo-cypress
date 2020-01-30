@@ -1,121 +1,81 @@
-import React, { Component } from 'react';
-import Todo from './app/todo/todo';
-import './app/todo/todo.css';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
+import React, {useState} from 'react';
+import uuid from 'uuid';
 
-let counter = 1;
+import './App.css';
 
-class App extends Component {
-    state = {
-        list: [
-            {
-                id: 1,
-                value: "Create an app using create-react-app CLI",
-                complete: true
-            },
-            {
-                id: 2,
-                value: "Style app",
-                complete: true
-            },
-            {
-                id: 3,
-                value: "Add functionality",
-                complete: false
-            }
-        ],
-        item: ""
-    };
+const Todo = (props) => {
+  const {todo, handleDelete, handleComplete} = props;
+  const {id, name, complete} = todo;
+  return (<li className={`todo ${complete ? 'complete' : ''}`}>
+    <input data-id={id} type="checkbox" checked={complete} onChange={handleComplete}/>
+    <span className={complete ? 'complete' : ''}>{name}</span>
+    <a data-id={id} onClick={handleDelete} href="#">Delete</a>
+    <div>{JSON.stringify(handleDelete)}</div>
+  </li>);
+};
 
-    handleInputChange = event => {
-        this.setState({
-            item: event.target.value
-        });
-    };
+function App() {
+  // state hook to handle the todos array
+  const [state, setState] = useState({});
+  // state hook to handle the showType
+  const [showType, setShowType] = useState('all');
 
-    handleKeyPress = event => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-
-            const item = {
-                id: counter++,
-                value: this.state.item.slice()
-            };
-            this.setState({
-                list: this.state.list.concat(item),
-                item: ""
-            });
+  // handle key down
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') {
+      const id = uuid.v4();
+      setState({
+        ...state,
+        [id]: {
+          name: e.target.value,
+          id,
+          complete: false
         }
-    };
-
-    handleRemove = id => {
-        this.setState({
-            list: this.state.list.filter(c => c.id !== id)
-        });
-    };
-
-    clearCompleted = () => {
-      const items = this.state.list.filter(item => item.id === "");
-
-        this.setState({
-            list: items
-        })
-    };
-
-    render() {
-        return (
-            <section className="todoapp">
-
-                <header className="header">
-                    <h1>Todo</h1>
-                    <input type="text"
-                           autoFocus
-                           className="new-todo"
-                           value={this.state.item}
-                           placeholder="What needs to be done?"
-                           onKeyPress={this.handleKeyPress}
-                           onChange={this.handleInputChange}
-                    />
-                </header>
-
-                <section className="main">
-                    <ul className="todo-list">
-                        {this.state.list.map(item => {
-                            return (
-                                <li>
-                                    <div className="view">
-                                        <input className="toggle" type="checkbox" />
-                                        <Todo {...item} key={item.id} removeTodo={this.handleRemove} />
-                                    </div>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </section>
-
-                <Router>
-                    <footer class="footer">
-                        <span class="todo-count"><strong>{ this.state.list.length }</strong> item left</span>
-                        <ul class="filters">
-                            <li>
-                                <Link to="/">All</Link>
-                            </li>
-                            <li>
-                                <Link to="/active">Active</Link>
-                            </li>
-                            <li>
-                                <li><Link to="/completed">Completed</Link></li>
-                            </li>
-                        </ul>
-
-                        <button className="clear-completed"
-                                onClick={this.clearCompleted}> Clear completed </button>
-                    </footer>
-                </Router>
-
-    </section>
-        );
+    });
+      e.target.value = '';
     }
+  };
+  const handleDelete = e => {
+    const {id} = e.target.dataset;
+    delete state[id];
+    setState({
+      ...state
+    });
+  };
+  const handleComplete = e => {
+    const {id} = e.target.dataset;
+    state[id].complete = !state[id].complete;
+    setState({
+      ...state
+    });
+  };
+  const handleShowType = e => {
+    const {type} = e.target.dataset;
+    console.log(type);
+    setShowType(type);
+  };
+
+  // render the todos
+  const renderedTodos = Object.values(state)
+    .map(t =>
+      <Todo handleDelete={handleDelete}
+            handleComplete={handleComplete}
+            key={t.id}
+            todo={t}/>);
+
+  // render the app
+  return (<section className={'todos'}>
+    <input type="text" onKeyDown={handleKeyDown}/>
+    <h1>Todos</h1>
+    <ul>
+      <li><a href="#" data-type="active" onClick={handleShowType}>Show Active</a></li>
+      <li><a href="#" data-type="all" onClick={handleShowType}>Show All</a></li>
+      <li><a href="#" data-type="complete" onClick={handleShowType}>Show Complete</a></li>
+    </ul>
+    <ul className={`todos ${showType}`}>
+      {renderedTodos}
+    </ul>
+  </section>);
 }
 
 export default App;
