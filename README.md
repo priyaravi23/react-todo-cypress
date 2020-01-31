@@ -1,3 +1,7 @@
+## End to End Testing React Todo App With Cypress
+
+![](public/todo.png)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -66,3 +70,22 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+## Install Cypress
+
+`yarn add cypress --dev`
+
+### Opening Cypress
+
+`npx cypress open`
+`yarn run cypress open`
+
+### Add Cypress commands to scripts
+
+```json
+{
+  "scripts": {
+    "cypress:open": "cypress open"
+  }
+}
+``` 
