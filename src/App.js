@@ -23,7 +23,16 @@ class App extends Component {
                 complete: false
             }
         ],
-        currentTodo: ""
+        currentTodo: "",
+        filter: 'all'
+    };
+
+    handleFilterChange = e => {
+        e.preventDefault();
+        const filter = e.target.dataset.filter;
+        this.setState({
+            filter
+        });
     };
 
     handleTodoChange = event => {
@@ -87,39 +96,8 @@ class App extends Component {
         });
     };
 
-    getCompletedTodos = () => {
-        const completedTodos = this.state.todos.filter(todo => {
-            if (todo.complete) {
-                return todo;
-            }
-        });
-
-        this.setState({
-            todos: completedTodos
-        })
-    };
-
-    getActiveTodos = () => {
-        const activeTodos = this.state.todos.filter(todo => {
-            if (!todo.complete) {
-                return todo;
-            }
-        });
-
-        this.setState({
-            todos: activeTodos
-        })
-    };
-
-    getAllTodos = () => {
-      const allTodos = this.state.todos;
-
-      this.setState({
-          todos: allTodos
-      })
-    };
-
     render() {
+        const {filter} = this.state;
         return (
             <section className="todoapp">
 
@@ -136,10 +114,10 @@ class App extends Component {
                 </header>
 
                 <section className="main">
-                    <ul className="todo-list">
+                    <ul className={`todo-list ${filter}`}>
                         {this.state.todos.map(item => {
                             return (
-                                <li className={item.complete ? "completed" : ""}>
+                                <li className={item.complete ? "todo completed" : "todo"}>
                                     <div className="view">
                                         <input className="toggle"
                                                type="checkbox"
@@ -159,13 +137,13 @@ class App extends Component {
                         <span class="todo-count"><strong>{(this.state.todos.filter(todo => !todo.complete)).length}</strong> item left</span>
                         <ul class="filters">
                             <li>
-                                <a href="#" onClick={this.getAllTodos}>All</a>
+                                <a data-filter="all" href="#" onClick={this.handleFilterChange}>All</a>
                             </li>
                             <li>
-                                <a href="#" onClick={this.getActiveTodos}>Active</a>
+                                <a data-filter="active"  href="#" onClick={this.handleFilterChange}>Active</a>
                             </li>
                             <li>
-                                <a href="#" onClick={this.getCompletedTodos}>Completed</a>
+                                <a data-filter="complete"  href="#" onClick={this.handleFilterChange}>Completed</a>
                             </li>
                         </ul>
 

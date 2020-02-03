@@ -32,7 +32,7 @@ describe('todo', () => {
         cy.get('.todo-list li')
             .first()
             .find('.destroy')
-            .click()
+            .click({force: true})
             .get('.todo-list li')
             .should('have.length', 2)
     });

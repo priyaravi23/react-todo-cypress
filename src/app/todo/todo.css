@@ -223,7 +223,7 @@ body {
 }
 
 .todo-list li .destroy {
-    /*display: none;*/
+    display: none;
     position: absolute;
     top: 0;
     right: 10px;
@@ -373,4 +373,9 @@ html .clear-completed:active {
     .filters {
         bottom: 10px;
     }
+}
+
+.todo-list.complete .todo:not(.completed),
+.todo-list.active .todo.completed {
+    display: none;
 }
